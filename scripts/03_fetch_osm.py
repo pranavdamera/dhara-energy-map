@@ -1,10 +1,14 @@
 from pathlib import Path
+import os
 
 import geopandas as gpd
 import requests
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-DB_URL = "postgresql://dhara_user:dhara_pass@localhost:5433/dhara"
+load_dotenv()
+
+DB_URL = os.getenv("DATABASE_URL", "postgresql://dhara_user:dhara_pass@localhost:5433/dhara")
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 OUT_PATH = Path("data/raw/osm/anantapur_overpass.json")
 
@@ -15,6 +19,11 @@ district = gpd.read_postgis(
     engine,
     geom_col="geom",
 ).to_crs("EPSG:4326")
+
+if district.empty:
+    print("[ERROR] District 'Anantapur' not found in `districts`.")
+    print("Run scripts/01_load_boundary.py first.")
+    raise SystemExit(1)
 
 minx, miny, maxx, maxy = district.total_bounds
 bbox = f"{miny},{minx},{maxy},{maxx}"
@@ -38,4 +47,4 @@ resp.raise_for_status()
 OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 OUT_PATH.write_text(resp.text)
 
-print("Saved OSM Overpass response")
+print(f"Saved OSM Overpass response: {OUT_PATH}")

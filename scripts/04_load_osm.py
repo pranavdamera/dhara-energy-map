@@ -1,8 +1,13 @@
+import os
+
 import geopandas as gpd
 import osmnx as ox
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-DB_URL = "postgresql://dhara_user:dhara_pass@localhost:5433/dhara"
+load_dotenv()
+
+DB_URL = os.getenv("DATABASE_URL", "postgresql://dhara_user:dhara_pass@localhost:5433/dhara")
 engine = create_engine(DB_URL)
 
 district = gpd.read_postgis(
@@ -10,6 +15,11 @@ district = gpd.read_postgis(
     engine,
     geom_col="geom",
 ).to_crs("EPSG:4326")
+
+if district.empty:
+    print("[ERROR] District 'Anantapur' not found in `districts`.")
+    print("Run scripts/01_load_boundary.py first.")
+    raise SystemExit(1)
 
 poly = district.geometry.iloc[0]
 
@@ -25,6 +35,7 @@ roads_out = roads[["osmid", "name", "highway", "surface", "geometry"]].copy()
 roads_out["osm_id"] = roads_out["osmid"].astype(str)
 roads_out["source"] = "OpenStreetMap"
 roads_out = roads_out[["osm_id", "name", "highway", "surface", "source", "geometry"]]
+# Keep storage geometry in EPSG:4326; use EPSG:32644 later for metric distances.
 roads_out = roads_out.rename(columns={"geometry": "geom"}).set_geometry("geom")
 roads_out.to_postgis("roads", engine, if_exists="append", index=False)
 
