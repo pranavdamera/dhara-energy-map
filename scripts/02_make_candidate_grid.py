@@ -1,10 +1,14 @@
 import uuid
+import os
 
 import geopandas as gpd
+from dotenv import load_dotenv
 from shapely.geometry import box
 from sqlalchemy import create_engine
 
-DB_URL = "postgresql://dhara_user:dhara_pass@localhost:5433/dhara"
+load_dotenv()
+
+DB_URL = os.getenv("DATABASE_URL", "postgresql://dhara_user:dhara_pass@localhost:5433/dhara")
 
 engine = create_engine(DB_URL)
 
@@ -14,9 +18,15 @@ district = gpd.read_postgis(
     geom_col="geom",
 ).to_crs("EPSG:32644")
 
+if district.empty:
+    print("[ERROR] District 'Anantapur' not found in table `districts`.")
+    print("Run scripts/01_load_boundary.py first.")
+    raise SystemExit(1)
+
 district_id = int(district.iloc[0]["id"])
 boundary = district.geometry.iloc[0]
 
+# Build 1 km x 1 km grid in metric CRS for meaningful cell size.
 cell_size = 1000  # meters
 minx, miny, maxx, maxy = boundary.bounds
 
@@ -42,9 +52,13 @@ while x < maxx:
         y += cell_size
     x += cell_size
 
+if not cells:
+    print("[ERROR] No candidate cells were generated. Check boundary geometry.")
+    raise SystemExit(1)
+
 gdf = gpd.GeoDataFrame(cells, crs="EPSG:32644")
 gdf["centroid"] = gdf.geometry.centroid
-gdf = gdf.to_crs("EPSG:4326")
+gdf = gdf.to_crs("EPSG:4326")  # Store final geometry in EPSG:4326.
 gdf["centroid"] = gdf.to_crs("EPSG:32644").geometry.centroid.to_crs("EPSG:4326")
 
 # GeoPandas only writes one geometry column cleanly.
