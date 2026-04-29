@@ -1,10 +1,19 @@
+import os
+
 import ee
 import geemap
 import geopandas as gpd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-DB_URL = "postgresql://dhara_user:dhara_pass@localhost:5433/dhara"
-GCP_PROJECT_ID = "YOUR_GCP_PROJECT_ID"
+load_dotenv()
+
+DB_URL = os.getenv("DATABASE_URL", "postgresql://dhara_user:dhara_pass@localhost:5433/dhara")
+GCP_PROJECT_ID = os.getenv("GEE_PROJECT_ID", "YOUR_GCP_PROJECT_ID")
+
+if GCP_PROJECT_ID == "YOUR_GCP_PROJECT_ID":
+    print("[ERROR] Set GEE_PROJECT_ID in your .env before running this script.")
+    raise SystemExit(1)
 
 engine = create_engine(DB_URL)
 ee.Initialize(project=GCP_PROJECT_ID)
@@ -14,6 +23,12 @@ district = gpd.read_postgis(
     engine,
     geom_col="geom",
 ).to_crs("EPSG:4326")
+
+if district.empty:
+    print("[ERROR] District 'Anantapur' not found in `districts`.")
+    print("Run scripts/01_load_boundary.py first.")
+    raise SystemExit(1)
+
 region = geemap.geopandas_to_ee(district).geometry()
 
 
@@ -93,3 +108,8 @@ srtm_task = ee.batch.Export.image.toDrive(
 )
 srtm_task.start()
 print("Started SRTM export:", srtm_task.id)
+
+print(
+    "After tasks finish, manually download files from Google Drive/dhara_energy_map "
+    "into data/raw/gee_exports/"
+)
