@@ -1,7 +1,9 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS postgis_raster;
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Geometries are stored in EPSG:4326 for interoperability.
+-- Use EPSG:32644 for metric distance/area calculations in analysis queries.
 
 DROP TABLE IF EXISTS reports CASCADE;
 DROP TABLE IF EXISTS risk_flags CASCADE;
