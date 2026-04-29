@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+data/raw/**/*.tif
+data/raw/**/*.zip
+data/raw/**/*.json
+data/processed/rasters/*.tif
+
+.pytest_cache/
+.mypy_cache/
