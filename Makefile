@@ -34,5 +34,11 @@ compute-scores:
 smoke-test:
 	$(PYTHON) scripts/08_smoke_test_db.py
 
+smoke-api:
+	PYTHONPATH=. $(PYTHON) scripts/09_smoke_api.py
+
+seed-demo:
+	PYTHONPATH=. $(PYTHON) scripts/seed_demo.py
+
 api:
 	uvicorn backend.app.main:app --reload --port 8000
