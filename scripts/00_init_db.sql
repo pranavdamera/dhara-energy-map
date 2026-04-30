@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 DROP TABLE IF EXISTS reports CASCADE;
 DROP TABLE IF EXISTS risk_flags CASCADE;
+DROP TABLE IF EXISTS parcel_observation_snapshots CASCADE;
 DROP TABLE IF EXISTS scores CASCADE;
 DROP TABLE IF EXISTS slope CASCADE;
 DROP TABLE IF EXISTS land_cover CASCADE;
@@ -150,3 +151,23 @@ CREATE TABLE reports (
     report_status TEXT CHECK (report_status IN ('pending', 'ready', 'failed')) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT now()
 );
+
+-- Parcel-level timestamped observations from field surveys or satellite-derived raster extracts.
+-- Designed to support future multi-temporal monitoring and change overlay workflows.
+CREATE TABLE parcel_observation_snapshots (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    site_id UUID REFERENCES candidate_sites(id) ON DELETE CASCADE,
+    observed_at TIMESTAMP NOT NULL,
+    source TEXT NOT NULL,
+    observation_type TEXT NOT NULL CHECK (observation_type IN ('field_survey', 'satellite_derived', 'raster_composite')),
+    raster_asset_url TEXT,
+    ndvi_mean NUMERIC,
+    cloud_cover NUMERIC,
+    change_score NUMERIC,
+    notes TEXT,
+    footprint geometry(Polygon, 4326),
+    created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE INDEX obs_snapshots_site_idx ON parcel_observation_snapshots (site_id);
+CREATE INDEX obs_snapshots_observed_at_idx ON parcel_observation_snapshots (observed_at DESC);

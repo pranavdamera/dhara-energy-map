@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 
 from backend.app.routes.health import router as health_router
+from backend.app.routes.observations import router as observations_router
 from backend.app.routes.sites import router as sites_router
 
 app = FastAPI(title="Dhara Energy Map API", version="0.1.0")
 
 app.include_router(health_router)
 app.include_router(sites_router)
+app.include_router(observations_router)
 
 
 @app.get("/methodology")
