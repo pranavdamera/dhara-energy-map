@@ -1,0 +1,91 @@
+{
+  "type": "FeatureCollection",
+  "name": "dhara_ranked_sites_demo",
+  "_note": "Sample output from GET /sites/ranked. Run seed_demo.py + make api for live responses.",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [77.5842, 14.8231] },
+      "properties": {
+        "id": "a1b2c3d4-0000-0000-0000-000000000001",
+        "grid_id": "demo_r042_c017",
+        "area_ha": 98.4,
+        "total_score": 0.763,
+        "confidence_score": 0.8,
+        "rank": 1,
+        "score_breakdown": {
+          "solar_norm": 0.84, "solar_contribution": 0.210,
+          "substation_norm": 0.72, "substation_contribution": 0.144,
+          "road_norm": 0.91, "road_contribution": 0.137,
+          "slope_norm": 0.95, "slope_contribution": 0.143,
+          "land_norm": 0.61, "land_contribution": 0.092,
+          "crop_norm": 0.58, "crop_contribution": 0.058,
+          "score_version": "v1.0"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [77.4921, 14.9102] },
+      "properties": {
+        "id": "a1b2c3d4-0000-0000-0000-000000000003",
+        "grid_id": "demo_r051_c009",
+        "area_ha": 102.3,
+        "total_score": 0.741,
+        "confidence_score": 0.7,
+        "rank": 2,
+        "score_breakdown": {
+          "solar_norm": 0.91, "solar_contribution": 0.228,
+          "substation_norm": 0.48, "substation_contribution": 0.096,
+          "road_norm": 0.83, "road_contribution": 0.125,
+          "slope_norm": 0.97, "slope_contribution": 0.146,
+          "land_norm": 0.70, "land_contribution": 0.105,
+          "crop_norm": 0.62, "crop_contribution": 0.062,
+          "score_version": "v1.0"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [77.6103, 14.7894] },
+      "properties": {
+        "id": "a1b2c3d4-0000-0000-0000-000000000002",
+        "grid_id": "demo_r038_c021",
+        "area_ha": 87.1,
+        "total_score": 0.724,
+        "confidence_score": 0.8,
+        "rank": 3,
+        "score_breakdown": {
+          "solar_norm": 0.79, "solar_contribution": 0.198,
+          "substation_norm": 0.81, "substation_contribution": 0.162,
+          "road_norm": 0.74, "road_contribution": 0.111,
+          "slope_norm": 0.88, "slope_contribution": 0.132,
+          "land_norm": 0.55, "land_contribution": 0.083,
+          "crop_norm": 0.44, "crop_contribution": 0.044,
+          "score_version": "v1.0"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [77.7241, 14.7102] },
+      "properties": {
+        "id": "a1b2c3d4-0000-0000-0000-000000000004",
+        "grid_id": "demo_r031_c033",
+        "area_ha": 75.6,
+        "total_score": 0.611,
+        "confidence_score": 0.8,
+        "rank": 4,
+        "score_breakdown": {
+          "solar_norm": 0.68, "solar_contribution": 0.170,
+          "substation_norm": 0.60, "substation_contribution": 0.120,
+          "road_norm": 0.55, "road_contribution": 0.083,
+          "slope_norm": 0.82, "slope_contribution": 0.123,
+          "land_norm": 0.44, "land_contribution": 0.066,
+          "crop_norm": 0.71, "crop_contribution": 0.071,
+          "score_version": "v1.0"
+        }
+      }
+    }
+  ]
+}

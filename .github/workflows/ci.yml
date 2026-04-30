@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  backend-imports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install fastapi pydantic sqlalchemy psycopg2-binary python-dotenv
+      - name: Check backend imports
+        run: |
+          python -c "from backend.app.schemas import SiteDetail; print('[OK] schemas')"
+          python -c "from backend.app.settings import Settings; print('[OK] settings')"
+          python -c "from backend.app.routes.sites import router; print('[OK] routes.sites')"
+          python -c "from backend.app.routes.health import router; print('[OK] routes.health')"
+
+  scoring-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install numpy pandas psycopg2-binary python-dotenv
+      - name: Verify demo scores are internally consistent
+        run: |
+          python -c "
+          import sys; sys.path.insert(0, '.')
+          from scripts.seed_demo import SCORES
+          weights = dict(solar=0.25, substation=0.20, road=0.15, slope=0.15, land=0.15, crop=0.10)
+          for sid, solar, sub, road, slope, land, crop, total, conf in SCORES:
+              recomputed = round(
+                  solar*weights['solar'] + sub*weights['substation'] +
+                  road*weights['road'] + slope*weights['slope'] +
+                  land*weights['land'] + crop*weights['crop'], 3
+              )
+              assert abs(recomputed - total) < 0.002, f'score mismatch: {recomputed} vs {total}'
+          print(f'[OK] {len(SCORES)} demo site scores verified')
+          "
